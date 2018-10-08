@@ -130,5 +130,5 @@ def check(ip, port, timeout):
     except Exception, e:
         pass
 
-#ip = 'ci.chinatopcredit.com'
+#ip = 'xxx'
 #check(ip,443,5)
